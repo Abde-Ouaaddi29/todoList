@@ -18,7 +18,7 @@ export default function TodoList() {
 
         <li className="mb-2 bg-gray-100 border-1 flex justify-between p-3  " key={k}>
 
-          <div className=" w-8/12 text-black font-bold overflow-auto flex items-center	"> {item} </div>
+          <div className=" w-7/12 text-black font-bold overflow-auto	"> {item} </div>
 
           <div className=" flex justify-end w-5/12  ">
           <span className="text-gray-400 font-lighter p-2 mr-4 border-b "> {currentDate[k]} </span>
