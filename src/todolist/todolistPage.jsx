@@ -64,7 +64,7 @@ export default function TodoList() {
     }
   };
 
- //// the remove function 
+ //// the removing function 
   const handleremove = (index) => {
     setItems((prevState) => prevState.filter((_, i) => i !== index));
     setCurrentDate((prevState)=> prevState.filter((_,i) => i !== index));
@@ -72,7 +72,7 @@ export default function TodoList() {
   };
 
 
-  //// the update function 
+  //// the updating function 
   const handleUpdate = (index) => {
     setUpdateIndex(index); // Set updateIndex to the index of the item to be updated
     text.current.value = items[index]; // Set the input value to the text of the item to be updated
