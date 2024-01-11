@@ -40,6 +40,7 @@ export default function TodoList() {
     });
   };
 
+
 //// the add function 
   const handleADD = () => {
     const TextValue = text.current.value;
@@ -64,6 +65,7 @@ export default function TodoList() {
     }
   };
 
+  
  //// the removing function 
   const handleremove = (index) => {
     setItems((prevState) => prevState.filter((_, i) => i !== index));
