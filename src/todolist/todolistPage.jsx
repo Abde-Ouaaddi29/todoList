@@ -135,7 +135,7 @@ export default function TodoList() {
         </div>
 
         <div className=" mt-4 xl:w-10/12 lg:w-10/12 md:w-10/12 w-full  m-auto p-4 ">
-          <ul>{items.length > 0 ? displaylist() : <li className="text-gray-600 border-2 p-4">No items</li>}</ul>
+          <ul>{items.length > 0 ? displaylist() : <li className="text-gray-600 border-2 p-4">No Items</li>}</ul>
         </div>
       </div>
     </section>
