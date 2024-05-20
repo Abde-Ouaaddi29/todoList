@@ -1,38 +1,71 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./todo.module.css";
 
 export default function TodoList() {
-  const [items, setItems] = useState([]);
-  const [newuser, setNewuser] = useState('') ;
-  const [currentDate, setCurrentDate] = useState([])
-  const [updateIndex, setUpdateIndex] = useState(null); // New state to track the item to be updated
-  const [isToglle, setIsToglle] = useState(false)
+
+  const [items, setItems] = useState(() => {
+    const storedItems = localStorage.getItem('items');
+    return storedItems ? JSON.parse(storedItems) : [];
+  });
+
+  const [newuser, setNewuser] = useState('');
+
+  const [currentDate, setCurrentDate] = useState(() => {
+    const storedDates = localStorage.getItem('currentDate');
+    return storedDates ? JSON.parse(storedDates) : [];
+  });
+
+  const [isCompleted, setIsCompleted] = useState(() => {
+    const storedCompleted = localStorage.getItem('isCompleted');
+    return storedCompleted ? JSON.parse(storedCompleted) : [];
+  });
+
+  const [updateIndex, setUpdateIndex] = useState(null);
+  const [isToglle, setIsToglle] = useState(false);
   const text = useRef();
   const userName = useRef();
-  // let isUserAdded = false
+
+  useEffect(() => {
+    // Save items to localStorage whenever the items state changes
+    console.log('Saving to localStorage:', items, currentDate, isCompleted);
+    localStorage.setItem('items', JSON.stringify(items));
+    localStorage.setItem('currentDate', JSON.stringify(currentDate));
+    localStorage.setItem('isCompleted', JSON.stringify(isCompleted));
+  }, [items, currentDate, isCompleted]);
+
+
+
 
   const displaylist = () => {
     
     return items.map((item, k) => {
       return (
 
-        <li className="mb-2 bg-gray-100 border-1 flex justify-between p-3 " key={k}>
+        <li className={isCompleted[k]? "  mb-2 bg-gray-200 border-1 flex justify-between p-3 ":"mb-2 bg-gray-100 border-1 flex justify-between p-3 "} key={k}>
 
-          <div className=" lg:w-7/12 xl:w-7/12 md:w-7/12 w-8/12  text-black font-bold overflow-auto	"> {item} </div>
+          <div className={isCompleted[k] ? " lg:w-7/12 xl:w-7/12 md:w-7/12 w-8/12  text-black font-bold overflow-auto line-through opacity-25	":" lg:w-7/12 xl:w-7/12 md:w-7/12 w-8/12  text-black font-bold overflow-auto	"}> {item} </div>
 
           <div className="flex justify-end lg:w-5/12 xl:w-5/12 md:w-5/12 w-3/12  ">
-                <span className="text-gray-400 font-lighter p-2 mr-4 border-b lg:flex xl:flex md:flex hidden "> {currentDate[k]} </span>
+                <span className={isCompleted[k] ? "text-gray-400 font-lighter p-2 mr-4 border-b lg:flex xl:flex md:flex hidden opacity-30	 ":"text-gray-400 font-lighter p-2 mr-4 border-b lg:flex xl:flex md:flex hidden "}> {currentDate[k]} </span>
 
-                <button className="border-b p-2 text-white font-bold" onClick={() => handleremove(k)}>
+                {isCompleted[k] ? 
+                  <button className="border-b p-2 text-white font-bold" onClick={() => handleremove(k)}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6 text-red-500 hover:text-red-400 hover:translate-y-0.5 transform transition-all duration-300">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                  </svg>
-                </button>
-
+                    </svg>
+                 </button>
+                :
                 <button className="border-b lg:ml-4 xl:ml-4 md:ml-4 ml-0 p-2 text-white font-bold" onClick={() => handleUpdate(k)}>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6 text-green-500 hover:text-green-400 hover:translate-y-0.5 transform transition-all duration-300" >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6 text-green-500 hover:text-green-400 hover:translate-y-0.5 transform transition-all duration-300" >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+              </svg>
+              </button>
+                }
+
+               
+
+                <button className="border-b lg:ml-4 xl:ml-4 md:ml-4 ml-0 p-2 text-white font-bold">
+                    <input onChange={() => handleCompleted(k)} type="checkbox" className="h-5 w-5" checked={isCompleted[k]} />
                 </button>
           </div>
         </li>
@@ -40,6 +73,14 @@ export default function TodoList() {
     });
   };
 
+
+  const handleCompleted = (index) => {
+    setIsCompleted((prev) => {
+      const updatedItems = [...prev];
+      updatedItems[index] = !updatedItems[index];
+      return updatedItems;
+    });
+  };
 
 //// the add function 
   const handleADD = () => {
@@ -67,11 +108,13 @@ export default function TodoList() {
 
   
  //// the removing function 
-  const handleremove = (index) => {
-    setItems((prevState) => prevState.filter((_, i) => i !== index));
-    setCurrentDate((prevState)=> prevState.filter((_,i) => i !== index));
-    console.log("remove");
-  };
+ const handleremove = (index) => {
+  setItems((prevState) => prevState.filter((_, i) => i !== index));
+  setCurrentDate((prevState) => prevState.filter((_, i) => i !== index));
+  setIsCompleted((prevState) => prevState.filter((_, i) => i !== index));
+  console.log("remove");
+};
+
 
 
   //// the updating function 
@@ -111,8 +154,8 @@ export default function TodoList() {
     
       {isToglle ? 
           <div className="mt-4 text-center xl:w-full lg:w-full "> 
-            <input className="p-2 mr-2 xl:w-4/12 lg:w-4/12 md:w-4/12 rounded-md w-5/12" type="text" ref={userName} placeholder="username" />
-            <button className="p-2 bg-yellow-400 rounded-md hover:bg-yellow-500 hover:translate-y-0.5 transform transition-all duration-300" onClick={AddUser} type="submit"> submit </button>
+            <input className="p-2 mr-2 xl:w-4/12 lg:w-4/12 outline-yellow-300 md:w-4/12 rounded-md w-5/12 -tracking-tight" type="text" ref={userName} placeholder="username..." />
+            <button className="py-2 px-4 bg-yellow-400 rounded font-bold tracking-widest text-yellow-700 hover:bg-yellow-500 hover:translate-y-0.5 transform transition-all duration-300 hover:text-yellow-700" onClick={AddUser} type="submit"> submit </button>
           </div>
         : 
         ''
@@ -128,8 +171,8 @@ export default function TodoList() {
         </div>
       <div className="lg:w-10/12 xl:w-10/12 md:w-10/12 w-10/12 bg-gray-300 p-5">
         <div className="w-9/12 flex justify-evenly m-auto">
-          <input className="border p-2 lg:w-9/12 xl:9/12 md:9/12 w-8/12 " ref={text} type="text"/>
-          <button className="bg-blue-300 text-white p-2 lg:w-2/12 xl:2/12 md:2/12 w-3/12 font-bold hover:bg-blue-400 hover:translate-y-0.5 transform transition-all duration-300" onClick={handleADD}>
+          <input placeholder="Typing..." className="border outline-blue-200 rounded p-2 lg:w-9/12 xl:9/12 md:9/12 w-8/12 " ref={text} type="text"/>
+          <button className="bg-blue-300 text-blue-600 rounded p-2 lg:w-2/12 xl:2/12 md:2/12 w-3/12 font-bold hover:bg-blue-400 hover:translate-y-0.5 transform transition-all duration-300" onClick={handleADD}>
             ADD
           </button>
         </div>
@@ -161,8 +204,8 @@ export default function TodoList() {
           </div>
           <div className="lg:w-10/12 xl:w-10/12 md:w-10/12 w-10/12 bg-gray-300 p-5">
         <div className="w-9/12 flex justify-evenly m-auto">
-          <input className="border p-2 lg:w-9/12 xl:9/12 md:9/12 w-8/12 " ref={text} type="text"/>
-          <button className="bg-blue-300 text-white p-2 lg:w-2/12 xl:2/12 md:2/12 w-3/12 font-bold hover:bg-blue-400 hover:translate-y-0.5 transform transition-all duration-300" onClick={handleADD}>
+          <input placeholder="Typing..." className="border outline-yellow-200 rounded p-2 lg:w-9/12 xl:9/12 md:9/12 w-8/12 " ref={text} type="text"/>
+          <button className="bg-yellow-300 text-yellow-600 rounded p-2 lg:w-2/12 xl:2/12 md:2/12 w-3/12 font-bold hover:bg-yellow-400 hover:translate-y-0.5 transform transition-all duration-300" onClick={handleADD}>
             ADD
           </button>
         </div>
