@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { GrAdd } from "react-icons/gr";
 import "./todo.module.css";
 
 export default function TodoList() {
@@ -8,7 +9,10 @@ export default function TodoList() {
     return storedItems ? JSON.parse(storedItems) : [];
   });
 
-  const [newuser, setNewuser] = useState('');
+  const [newuser, setNewuser] = useState(() => {
+    const storeUser = localStorage.getItem('user');
+    return storeUser ? JSON.parse(storeUser) : '';
+  });
 
   const [currentDate, setCurrentDate] = useState(() => {
     const storedDates = localStorage.getItem('currentDate');
@@ -20,21 +24,25 @@ export default function TodoList() {
     return storedCompleted ? JSON.parse(storedCompleted) : [];
   });
 
+  const [isUpdating , setIsUpdating] = useState(false)
+
   const [updateIndex, setUpdateIndex] = useState(null);
   const [isToglle, setIsToglle] = useState(false);
   const text = useRef();
   const userName = useRef();
 
   useEffect(() => {
-    // Save items to localStorage whenever the items state changes
-    console.log('Saving to localStorage:', items, currentDate, isCompleted);
+    console.log('Saving to localStorage:', items, currentDate, isCompleted,newuser);
     localStorage.setItem('items', JSON.stringify(items));
     localStorage.setItem('currentDate', JSON.stringify(currentDate));
     localStorage.setItem('isCompleted', JSON.stringify(isCompleted));
-  }, [items, currentDate, isCompleted]);
+    localStorage.setItem('user', JSON.stringify(newuser));
+  }, [items, currentDate, isCompleted,newuser]);
 
 
-
+const handleRemoveUser = () => {
+  setNewuser('')
+}
 
   const displaylist = () => {
     
@@ -82,14 +90,15 @@ export default function TodoList() {
     });
   };
 
-//// the add function 
+////--------------- the add function 
   const handleADD = () => {
+    setIsUpdating(false)
     const TextValue = text.current.value;
     const date = ((new Date()).toISOString().substring( 11,16))  + " / " + ((new Date()).toISOString().substring(0,10 ))
     
     if (TextValue.trim() !== "") {
       if (updateIndex !== null) {
-        // If updateIndex is not null, update the existing item
+        ////////----------- If updateIndex is not null, update the existing item
         
         setItems((prevState) => {
           const updatedItems = [...prevState];
@@ -98,7 +107,7 @@ export default function TodoList() {
         });
         setUpdateIndex(null); // Reset updateIndex after updating
       } else {
-        // If updateIndex is null, add a new item
+        ////------------- If updateIndex is null, add a new item
         setItems((prevState) => [...prevState, TextValue]);
         setCurrentDate((prevState)=> [...prevState, date]);
       }
@@ -107,7 +116,7 @@ export default function TodoList() {
   };
 
   
- //// the removing function 
+ //// ---------- the removing function 
  const handleremove = (index) => {
   setItems((prevState) => prevState.filter((_, i) => i !== index));
   setCurrentDate((prevState) => prevState.filter((_, i) => i !== index));
@@ -119,9 +128,12 @@ export default function TodoList() {
 
   //// the updating function 
   const handleUpdate = (index) => {
-    setUpdateIndex(index); // Set updateIndex to the index of the item to be updated
-    text.current.value = items[index]; // Set the input value to the text of the item to be updated
+    setUpdateIndex(index); 
+    text.current.value = items[index]; 
     console.log("update");
+    setIsUpdating(true)
+    
+    console.log(isUpdating)
   };
 
   const toggleNotifucation = () => {
@@ -144,7 +156,7 @@ export default function TodoList() {
   if (newuser === '') {
       return <>
 
-      <div className="absolute left-3 top-3">
+      <div className="absolute  left-3 top-3">
         <button onClick={toggleNotifucation} className="  bg-yellow-400 p-2 font-bold rounded-md hover:bg-yellow-500 hover:translate-y-0.5 transform transition-all duration-300"> 
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6 ">
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
@@ -153,27 +165,27 @@ export default function TodoList() {
       </div> 
     
       {isToglle ? 
-          <div className="mt-4 text-center xl:w-full lg:w-full "> 
-            <input className="p-2 mr-2 xl:w-4/12 lg:w-4/12 outline-yellow-300 md:w-4/12 rounded-md w-5/12 -tracking-tight" type="text" ref={userName} placeholder="username..." />
-            <button className="py-2 px-4 bg-yellow-400 rounded font-bold tracking-widest text-yellow-700 hover:bg-yellow-500 hover:translate-y-0.5 transform transition-all duration-300 hover:text-yellow-700" onClick={AddUser} type="submit"> submit </button>
+          <div className=" bg-white p-4 text-center xl:w-full lg:w-full flex items-center justify-center"> 
+            <input className=" border-2 p-2 mr-2 xl:w-4/12 lg:w-4/12 outline-yellow-300 md:w-4/12 rounded-md w-5/12 -tracking-tight" type="text" ref={userName} placeholder="username..." />
+            <button className="py-2 px-4 bg-yellow-400 rounded font-bold tracking-widest text-yellow-700 hover:bg-yellow-500 hover:translate-y-0.5 transform transition-all duration-300 hover:text-yellow-700" onClick={AddUser} type="submit"> <GrAdd size={25} /> </button>
           </div>
         : 
         ''
       }
       
-      <section className="flex flex-col items-center w-full">
+      <section className=" bg-white flex flex-col items-center w-full">
 
-      <div className=" flex justify-center lg:w-5/12 md:w-10/12 w-10/12 p-5 text-3xl text-center lg:mt-2 lg:mb-5 xl:mt-2 xl:mb-5 md:mt-2 md:mb-5 mt-10 mb-5 ">
-              <h1 className="text-white font-bold "> Daily notes </h1>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-white mt-2 ml-2">
+      <div className="  flex justify-center lg:w-5/12 md:w-10/12 sm:w-10/12 p-5 text-3xl text-center lg:mt-2 xl:mt-2 md:mt mt-16 mb-5 ">
+              <h1 className=" font-bold text-black "> Daily notes </h1>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-black mt-2 ml-2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
             </svg>
-        </div>
+          </div>
       <div className="lg:w-10/12 xl:w-10/12 md:w-10/12 w-10/12 bg-gray-300 p-5">
         <div className="w-9/12 flex justify-evenly m-auto">
           <input placeholder="Typing..." className="border outline-blue-200 rounded p-2 lg:w-9/12 xl:9/12 md:9/12 w-8/12 " ref={text} type="text"/>
-          <button className="bg-blue-300 text-blue-600 rounded p-2 lg:w-2/12 xl:2/12 md:2/12 w-3/12 font-bold hover:bg-blue-400 hover:translate-y-0.5 transform transition-all duration-300" onClick={handleADD}>
-            ADD
+          <button className={isUpdating ? 'bg-green-300 text-green-600 rounded p-2 lg:w-2/12 xl:2/12 md:2/12 w-3/12 font-bold hover:bg-green-400 hover:translate-y-0.5 transform transition-all duration-300' : 'bg-yellow-300 text-yellow-600 rounded p-2 lg:w-2/12 xl:2/12 md:2/12 w-3/12 font-bold hover:bg-yellow-400 hover:translate-y-0.5 transform transition-all duration-300'} onClick={handleADD}>
+            {isUpdating ? 'UPDATE' : 'ADD'}
           </button>
         </div>
 
@@ -187,26 +199,31 @@ export default function TodoList() {
   }  else {
 
     return <>
-        <section className="flex flex-col items-center w-full">
+        <section className="flex bg-slate-100 flex-col items-center w-full">
 
-          <div className="  flex  p-2 text-2xl text-yellow-200 absolute left-3 top-3  ">
-              <h2 className="font-lighter" > Hello <span className="font-bold">{newuser}</span> </h2>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6 text-yellow-200  lg:mt-1 ml-2 ">
+          <div className="  flex items-center  p-2 text-2xl text-yellow-200 absolute left-3 top-3  px-6 bg-gray-100 hover:translate-y-0.5 transform transition-all duration-300 ">
+              <h2 className="font-lighter text-yellow-600" > welcome <span className="font-bold">{newuser}</span> </h2>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6 text-yellow-600  lg:mt-1 ml-2 ">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
           </svg>
+
+          <svg onClick={handleRemoveUser}  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-7 h-7 border-l cursor-pointer border-gray-500  ml-4 px-1 text-red-500 hover:text-red-400 hover:translate-y-0.5 transform transition-all duration-300">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+          </svg>
+            {/* <span onClick={handleRemoveUser} className="text-red-400 ml-4">remove</span> */}
           </div>
 
             <div className="  flex justify-center lg:w-5/12 md:w-10/12 sm:w-10/12 p-5 text-3xl text-center lg:mt-2 xl:mt-2 md:mt mt-16 mb-5 ">
-              <h1 className="text-white font-bold "> Daily notes </h1>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-white mt-2 ml-2">
+              <h1 className=" font-bold text-black "> Daily notes </h1>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-black mt-2 ml-2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
             </svg>
           </div>
           <div className="lg:w-10/12 xl:w-10/12 md:w-10/12 w-10/12 bg-gray-300 p-5">
         <div className="w-9/12 flex justify-evenly m-auto">
           <input placeholder="Typing..." className="border outline-yellow-200 rounded p-2 lg:w-9/12 xl:9/12 md:9/12 w-8/12 " ref={text} type="text"/>
-          <button className="bg-yellow-300 text-yellow-600 rounded p-2 lg:w-2/12 xl:2/12 md:2/12 w-3/12 font-bold hover:bg-yellow-400 hover:translate-y-0.5 transform transition-all duration-300" onClick={handleADD}>
-            ADD
+          <button className={isUpdating ? 'bg-green-300 text-green-600 rounded p-2 lg:w-2/12 xl:2/12 md:2/12 w-3/12 font-bold hover:bg-green-400 hover:translate-y-0.5 transform transition-all duration-300' : 'bg-yellow-300 text-yellow-600 rounded p-2 lg:w-2/12 xl:2/12 md:2/12 w-3/12 font-bold hover:bg-yellow-400 hover:translate-y-0.5 transform transition-all duration-300'} onClick={handleADD}>
+            {isUpdating ? 'UPDATE' : 'ADD'}
           </button>
         </div>
 
